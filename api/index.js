@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
-import chatRouter from "../backend/src/api/chat.js";
-import ingestRouter from "../backend/src/api/ingest.js";
+import chatRouter from "../backend/dist/api/chat.js";
+import ingestRouter from "../backend/dist/api/ingest.js";
 
 const app = express();
 
