@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAG Doc Chat</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-veil"></div>
+    <main class="shell">
+      <header class="hero">
+        <div class="hero-text">
+          <p class="eyebrow">Aprendizado com documentos</p>
+          <h1>RAG Doc Chat</h1>
+          <p class="subtitle">
+            Faça upload dos seus PDFs e TXT, indexe o conhecimento e converse com um tutor
+            que responde apenas com base no seu material.
+          </p>
+        </div>
+        <div class="hero-card">
+          <h2>Como funciona</h2>
+          <p class="card-lead">
+            Você envia seus arquivos e o sistema aprende o conteúdo para responder só com base neles.
+          </p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-number">1</div>
+              <div class="step-text">
+                <span class="step-title">Envie os documentos</span>
+                <span class="step-desc">PDF ou TXT, um ou vários.</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">2</div>
+              <div class="step-text">
+                <span class="step-title">Organização automática</span>
+                <span class="step-desc">O conteúdo é dividido e preparado.</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <div class="step-text">
+                <span class="step-title">Pergunte com segurança</span>
+                <span class="step-desc">Respostas claras e baseadas no seu material.</span>
+              </div>
+            </div>
+          </div>
+          <div class="status" id="systemStatus">Aguardando ações</div>
+        </div>
+      </header>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h3>1. Indexação de documentos</h3>
+          <p>Selecione seus arquivos para criar a base de conhecimento.</p>
+        </div>
+        <div class="panel-body">
+          <div class="upload-area" id="dropZone">
+            <input type="file" id="fileInput" multiple accept=".pdf,.txt" />
+            <div class="upload-text">
+              <strong>Arraste seus arquivos aqui</strong>
+              <span>ou clique para selecionar</span>
+            </div>
+          </div>
+          <div class="pill-row">
+            <span class="pill">Formatos: PDF, TXT</span>
+            <span class="pill">Processamento local</span>
+            <span class="pill">Sem limites por envio</span>
+          </div>
+          <button class="primary" id="ingestBtn">Indexar documentos</button>
+          <div class="panel-feedback" id="ingestFeedback"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h3>2. Chat com contexto</h3>
+          <p>Faça perguntas e receba respostas focadas no seu conteúdo.</p>
+        </div>
+        <div class="panel-body">
+          <div class="file-alert" id="fileAlert">
+            Nenhum documento indexado ainda.
+          </div>
+          <div class="file-picker">
+            <span>Arquivo ativo:</span>
+            <select id="fileSelect" disabled>
+              <option value="">Selecione um arquivo</option>
+            </select>
+          </div>
+          <div class="chat-window" id="chatWindow"></div>
+          <div class="chat-controls">
+            <textarea id="questionInput" placeholder="Digite sua pergunta..."></textarea>
+            <div class="controls-row">
+              <button class="secondary" id="askBtn">Perguntar</button>
+            </div>
+          </div>
+          <div class="panel-feedback" id="chatFeedback"></div>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
