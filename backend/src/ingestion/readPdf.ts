@@ -17,8 +17,7 @@ export async function readPdf(filePath: string): Promise<string> {
     const loadingTask = getDocument({
       data: new Uint8Array(buffer),
       stopAtErrors: false,
-      ignoreErrors: true,
-    });
+    } as any);
     const pdf = await loadingTask.promise;
     const pages: string[] = [];
     for (let i = 1; i <= pdf.numPages; i += 1) {

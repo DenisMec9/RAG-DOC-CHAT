@@ -17,7 +17,16 @@ async function main() {
   }
 
   const filePaths = args.map((arg) => path.resolve(arg));
-  await indexDocuments(filePaths);
+  
+  // Map string[] to DocumentInput[]
+  const fileInputs = filePaths.map((filePath) => {
+    const input: { path: string; originalName?: string } = {
+      path: filePath,
+    };
+    return input;
+  });
+  
+  await indexDocuments(fileInputs);
   console.log(`Indexados ${filePaths.length} arquivo(s).`);
 }
 
