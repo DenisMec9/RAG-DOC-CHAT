@@ -12,7 +12,8 @@
     {
       "src": "/api/(.*)",
       "headers": {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, no-cache, must-revalidate"
       }
     },
     {
@@ -20,7 +21,8 @@
       "methods": ["POST"],
       "headers": {
         "Content-Type": "multipart/form-data"
-      }
+      },
+      "dest": "/api/ingest.ts"
     },
     {
       "src": "/api/health",
@@ -46,32 +48,10 @@
       "status": 200
     }
   ],
-  "headers": [
+  "rewrites": [
     {
       "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type"
-        }
-      ]
-    },
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, no-cache, must-revalidate"
-        }
-      ]
+      "destination": "/frontend/index.html"
     }
   ]
 }
