@@ -10,9 +10,10 @@ export type StoredVector = {
   };
 };
 
-const isVercel = Boolean(process.env.VERCEL);
+// No Vercel, use /tmp. Otherwise use current directory
+const isVercel = process.env.VERCEL === "1";
 const runtimeDir = isVercel ? "/tmp" : process.cwd();
-const DEFAULT_STORE_PATH = path.join(runtimeDir, "data", "vectorstore.json");
+const DEFAULT_STORE_PATH = path.join(runtimeDir, "vectorstore.json");
 
 async function ensureStoreFile(filePath: string): Promise<void> {
   const dir = path.dirname(filePath);
@@ -26,10 +27,15 @@ async function ensureStoreFile(filePath: string): Promise<void> {
 
 export async function loadStore(): Promise<StoredVector[]> {
   const storePath = process.env.VECTORSTORE_PATH ?? DEFAULT_STORE_PATH;
-  await ensureStoreFile(storePath);
-  const raw = await fs.readFile(storePath, "utf8");
-  const parsed = JSON.parse(raw) as { items: StoredVector[] };
-  return parsed.items ?? [];
+  try {
+    await ensureStoreFile(storePath);
+    const raw = await fs.readFile(storePath, "utf8");
+    const parsed = JSON.parse(raw) as { items: StoredVector[] };
+    return parsed.items ?? [];
+  } catch {
+    // If file doesn't exist, return empty array
+    return [];
+  }
 }
 
 export async function saveStore(items: StoredVector[]): Promise<void> {
@@ -43,3 +49,4 @@ export async function addToStore(item: StoredVector): Promise<void> {
   items.push(item);
   await saveStore(items);
 }
+
