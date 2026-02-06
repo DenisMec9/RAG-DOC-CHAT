@@ -6,7 +6,7 @@ import { indexDocuments } from "../backend/dist/ingestion/indexDocuments.js";
 export const config = {
   api: {
     bodyParser: false,
-    maxBodySize: 10 * 1024 * 1024, // 10MB limit
+    maxBodySize: 10485760, // 10MB in bytes (not expression)
   },
 };
 
@@ -26,7 +26,7 @@ export default async function handler(
     const form = new IncomingForm({
       multiples: false,
       keepExtensions: true,
-      maxFileSize: 10 * 1024 * 1024, // 10MB
+      maxFileSize: 10485760, // 10MB
     });
 
     console.log("Parsing form...");
