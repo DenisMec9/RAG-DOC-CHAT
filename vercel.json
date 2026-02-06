@@ -8,49 +8,41 @@
       "maxDuration": 30
     }
   },
-  "routes": [
+  "headers": [
     {
-      "src": "/api/(.*)",
-      "headers": {
-        "Content-Type": "application/json",
-        "Cache-Control": "no-store, no-cache, must-revalidate"
-      }
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate"
+        }
+      ]
     },
     {
-      "src": "/api/ingest",
-      "methods": ["POST"],
-      "headers": {
-        "Content-Type": "multipart/form-data"
-      },
-      "dest": "/api/ingest.ts"
-    },
-    {
-      "src": "/api/health",
-      "dest": "/api/health.ts"
-    },
-    {
-      "src": "/api/chat",
-      "dest": "/api/chat.ts"
-    },
-    {
-      "src": "/api/ingest",
-      "dest": "/api/ingest.ts"
-    },
-    {
-      "src": "/assets/(.*)",
-      "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "src": "/.*",
-      "dest": "/frontend/index.html",
-      "status": 200
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/api/health",
+      "destination": "/api/health.ts"
+    },
+    {
+      "source": "/api/chat",
+      "destination": "/api/chat.ts"
+    },
+    {
+      "source": "/api/ingest",
+      "destination": "/api/ingest.ts"
+    },
+    {
+      "source": "/((?!api/).*)",
       "destination": "/frontend/index.html"
     }
   ]
