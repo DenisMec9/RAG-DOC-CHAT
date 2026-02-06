@@ -1,8 +1,16 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+
   "framework": null,
+
   "buildCommand": "npm install && cd backend && npm install && npm run build",
-  "outputDirectory": "public",
+
+  "functions": {
+    "api/*.ts": {
+      "maxDuration": 30
+    }
+  },
+
   "routes": [
     {
       "src": "/api/health",
@@ -18,4 +26,3 @@
     }
   ]
 }
-
