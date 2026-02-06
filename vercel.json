@@ -6,7 +6,7 @@
       "runtime": "nodejs22.x"
     }
   },
-  "buildCommand": "cd backend && npm install && npm run build",
+  "buildCommand": "npm install && cd backend && npm install && npm run build",
   "outputDirectory": "public",
   "routes": [
     {
