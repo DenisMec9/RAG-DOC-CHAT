@@ -12,9 +12,10 @@ const fileSelect = document.getElementById("fileSelect");
 const askBtn = document.getElementById("askBtn");
 const chatFeedback = document.getElementById("chatFeedback");
 
-const API_BASE = window.location.origin.includes("localhost:3000")
-  ? "http://localhost:3001"
-  : "/api";
+// Detectar ambiente corretamente
+const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+const API_BASE = isLocalhost ? "http://localhost:3001" : "/api";
+
 const indexedFiles = [];
 let activeFile = "";
 
@@ -177,3 +178,12 @@ askBtn.addEventListener("click", async () => {
 });
 
 renderFileAlert();
+
+// Suporte para Enter no textarea
+questionInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    askBtn.click();
+  }
+});
+

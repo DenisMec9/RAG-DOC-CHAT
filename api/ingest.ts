@@ -25,14 +25,14 @@ export default async function handler(
 
     form.parse(
       req,
-      async (err: Error | null, fields: Fields, files: { file?: File | File[] }) => {
+      async (err: Error | null, fields: Fields, files: { files?: File | File[] }) => {
         if (err) {
           console.error("Error parsing form:", err);
           return res.status(500).json({ error: "Erro ao processar upload" });
         }
 
-        // files.file can be an array or single file
-        const fileInput = files.file;
+        // files.files can be an array or single file
+        const fileInput = files.files;
 
         if (!fileInput || (Array.isArray(fileInput) && fileInput.length === 0)) {
           return res.status(400).json({ error: "Nenhum arquivo enviado" });
