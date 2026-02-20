@@ -1,24 +1,34 @@
 import { Router } from "express";
 import { retrieveContext } from "../rag/retrieveContext.js";
 import { buildPrompt } from "../rag/buildPrompt.js";
-
+import { enforceApiToken, enforceRateLimit } from "../security/policies.js";
 
 const router = Router();
 
 router.post("/chat", async (req, res) => {
   try {
+    if (!enforceApiToken(req, res)) return;
+    if (!enforceRateLimit(req, res, "chat", 30, 60_000)) return;
+
     const question = String(req.body?.question ?? "").trim();
     if (!question) {
       return res.status(400).json({ error: "Pergunta obrigatoria" });
     }
 
-    const topK = Number(req.body?.topK ?? 5);
+    const topK = Math.min(12, Math.max(1, Number(req.body?.topK ?? 5)));
     const fileName = req.body?.fileName ? String(req.body.fileName) : undefined;
     const chunks = await retrieveContext(question, topK, fileName);
+    const sources = chunks.slice(0, 5).map((chunk) => ({
+      source: chunk.metadata.source,
+      chunkIndex: chunk.metadata.chunkIndex,
+      score: Number(chunk.score.toFixed(4)),
+      excerpt: chunk.text.slice(0, 180),
+    }));
 
     if (chunks.length === 0) {
       return res.json({
         answer: "Nao encontrei essa informacao no material fornecido.",
+        sources: [],
       });
     }
 
@@ -61,7 +71,7 @@ router.post("/chat", async (req, res) => {
       return res.status(502).json({ error: "Resposta invalida do modelo" });
     }
 
-    return res.json({ answer });
+    return res.json({ answer, sources });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erro interno";
     return res.status(500).json({ error: message });

@@ -2,37 +2,37 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { IncomingForm, File, Fields } from "formidable";
 import fs from "fs/promises";
 import path from "path";
+import { clearStore } from "../backend/dist/vectorstore/store.js";
 import { indexDocuments } from "../backend/dist/ingestion/indexDocuments.js";
 import { enforceApiToken, enforceRateLimit } from "./_security";
 import { attachRequestLogging } from "./_observability";
 
-// Disable Vercel's default body parser for file uploads
 export const config = {
   api: {
     bodyParser: false,
-    maxBodySize: 10485760, // 10MB in bytes (not expression)
+    maxBodySize: 10485760,
   },
 };
 
 export default async function handler(
   req: VercelRequest,
-  res: VercelResponse
+  res: VercelResponse,
 ) {
-  attachRequestLogging(req, res, "/api/ingest");
-  let tempFiles: File[] = [];
+  attachRequestLogging(req, res, "/api/reindex");
 
+  let tempFiles: File[] = [];
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
   if (!enforceApiToken(req, res)) return;
-  if (!enforceRateLimit(req, res, "ingest", 10, 60_000)) return;
+  if (!enforceRateLimit(req, res, "reindex", 5, 60_000)) return;
 
   try {
     const form = new IncomingForm({
       multiples: true,
       keepExtensions: true,
-      maxFileSize: 10485760, // 10MB
-      maxTotalFileSize: 10485760 * 4, // 40MB total
+      maxFileSize: 10485760,
+      maxTotalFileSize: 10485760 * 4,
       maxFiles: 4,
     });
 
@@ -51,6 +51,7 @@ export default async function handler(
     if (files.length === 0) {
       return res.status(400).json({ error: "Nenhum arquivo enviado" });
     }
+
     const hasInvalidFormat = files.some((file) => {
       const ext = path.extname(file.originalFilename || file.newFilename || "").toLowerCase();
       return ext !== ".pdf" && ext !== ".txt";
@@ -59,15 +60,17 @@ export default async function handler(
       return res.status(400).json({ error: "Formato nao suportado. Envie apenas PDF ou TXT." });
     }
 
-    const fileInputs = files.map((file) => ({
-      path: file.filepath,
-      originalName: file.originalFilename || file.newFilename,
-    }));
-
-    await indexDocuments(fileInputs);
+    await clearStore();
+    await indexDocuments(
+      files.map((file) => ({
+        path: file.filepath,
+        originalName: file.originalFilename || file.newFilename,
+      })),
+    );
 
     return res.json({
       indexed: files.length,
+      mode: "reindex",
       files: files.map((file) => ({
         name: file.originalFilename || file.newFilename,
       })),
@@ -76,7 +79,6 @@ export default async function handler(
     const message = err instanceof Error ? err.message : "Erro interno";
     return res.status(500).json({ error: message });
   } finally {
-    // Formidable escreve arquivos temporários no disco do runtime; limpar sempre.
     await Promise.all(
       tempFiles.map(async (file) => {
         try {
@@ -88,4 +90,3 @@ export default async function handler(
     );
   }
 }
-

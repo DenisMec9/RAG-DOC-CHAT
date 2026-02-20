@@ -42,6 +42,14 @@
       "destination": "/api/ingest.ts"
     },
     {
+      "source": "/api/files",
+      "destination": "/api/files.ts"
+    },
+    {
+      "source": "/api/reindex",
+      "destination": "/api/reindex.ts"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/frontend/index.html"
     }
