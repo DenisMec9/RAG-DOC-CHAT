@@ -4,8 +4,8 @@ import fs from "fs/promises";
 import path from "path";
 import { clearStore } from "../backend/dist/vectorstore/store.js";
 import { indexDocuments } from "../backend/dist/ingestion/indexDocuments.js";
-import { enforceApiToken, enforceRateLimit } from "./_security";
-import { attachRequestLogging } from "./_observability";
+import { enforceApiToken, enforceRateLimit } from "./_security.js";
+import { attachRequestLogging } from "./_observability.js";
 
 export const config = {
   api: {

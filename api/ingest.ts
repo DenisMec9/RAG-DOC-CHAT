@@ -3,8 +3,8 @@ import { IncomingForm, File, Fields } from "formidable";
 import fs from "fs/promises";
 import path from "path";
 import { indexDocuments } from "../backend/dist/ingestion/indexDocuments.js";
-import { enforceApiToken, enforceRateLimit } from "./_security";
-import { attachRequestLogging } from "./_observability";
+import { enforceApiToken, enforceRateLimit } from "./_security.js";
+import { attachRequestLogging } from "./_observability.js";
 
 // Disable Vercel's default body parser for file uploads
 export const config = {

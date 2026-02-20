@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { retrieveContext } from "../backend/dist/rag/retrieveContext.js";
 import { buildPrompt } from "../backend/dist/rag/buildPrompt.js";
-import { enforceApiToken, enforceRateLimit } from "./_security";
-import { attachRequestLogging } from "./_observability";
+import { enforceApiToken, enforceRateLimit } from "./_security.js";
+import { attachRequestLogging } from "./_observability.js";
 
 export default async function handler(
   req: VercelRequest,
