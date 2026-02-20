@@ -13,7 +13,7 @@ const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 export const config = {
   api: {
     bodyParser: false,
-    maxBodySize: MAX_UPLOAD_BYTES,
+    maxBodySize: 4194304,
   },
 };
 
