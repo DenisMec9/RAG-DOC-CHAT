@@ -259,6 +259,19 @@ body {
   font-size: 0.92rem;
 }
 
+.selected-files {
+  border-radius: 12px;
+  border: 1px solid rgba(31, 32, 39, 0.12);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  color: var(--ink-700);
+}
+
+.selected-files.is-empty {
+  color: var(--ink-500);
+}
+
 .pill-row {
   display: flex;
   flex-wrap: wrap;

@@ -5,6 +5,7 @@ const reindexBtn = document.getElementById("reindexBtn");
 const deleteFileBtn = document.getElementById("deleteFileBtn");
 const ingestFeedback = document.getElementById("ingestFeedback");
 const systemStatus = document.getElementById("systemStatus");
+const selectedFiles = document.getElementById("selectedFiles");
 
 const chatWindow = document.getElementById("chatWindow");
 const questionInput = document.getElementById("questionInput");
@@ -77,6 +78,28 @@ function getSelectedFiles() {
   return Array.from(fileInput.files ?? []);
 }
 
+function renderSelectedFiles() {
+  const files = getSelectedFiles();
+  if (files.length === 0) {
+    selectedFiles.textContent = "Nenhum arquivo selecionado.";
+    selectedFiles.classList.add("is-empty");
+    ingestBtn.disabled = true;
+    reindexBtn.disabled = true;
+    return;
+  }
+
+  const names = files.map((file) => file.name);
+  selectedFiles.textContent = `Selecionados (${files.length}): ${names.join(", ")}`;
+  selectedFiles.classList.remove("is-empty");
+  ingestBtn.disabled = false;
+  reindexBtn.disabled = false;
+}
+
+function clearSelectedFiles() {
+  fileInput.value = "";
+  renderSelectedFiles();
+}
+
 function renderFileAlert() {
   if (indexedFiles.length === 0) {
     fileAlert.textContent = "Nenhum documento indexado ainda.";
@@ -134,6 +157,11 @@ dropZone.addEventListener("drop", (event) => {
   const dataTransfer = new DataTransfer();
   files.forEach((file) => dataTransfer.items.add(file));
   fileInput.files = dataTransfer.files;
+  renderSelectedFiles();
+});
+
+fileInput.addEventListener("change", () => {
+  renderSelectedFiles();
 });
 
 async function sendIngest(mode) {
@@ -163,6 +191,7 @@ async function sendIngest(mode) {
     if (!response.ok) throw new Error(data.error ?? "Erro ao indexar");
 
     await loadIndexedFiles();
+    clearSelectedFiles();
 
     ingestFeedback.textContent =
       mode === "reindex"
@@ -174,8 +203,7 @@ async function sendIngest(mode) {
     ingestFeedback.textContent = message;
     setStatus("Erro na indexacao", false);
   } finally {
-    ingestBtn.disabled = false;
-    reindexBtn.disabled = false;
+    renderSelectedFiles();
   }
 }
 
@@ -275,6 +303,7 @@ async function loadIndexedFiles() {
 }
 
 renderFileAlert();
+renderSelectedFiles();
 loadIndexedFiles();
 
 questionInput.addEventListener("keydown", (event) => {
