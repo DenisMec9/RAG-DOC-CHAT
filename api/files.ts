@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { deleteBySource, loadStore } from "../backend/dist/vectorstore/store.js";
 import { enforceApiToken, enforceRateLimit } from "./_security.js";
 import { attachRequestLogging } from "./_observability.js";
+import { sendHttpError } from "./_errors.js";
 
 export default async function handler(
   req: VercelRequest,
@@ -32,7 +33,6 @@ export default async function handler(
 
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Erro interno";
-    return res.status(500).json({ error: message });
+    return sendHttpError(res, err);
   }
 }

@@ -6,11 +6,14 @@ import { clearStore } from "../backend/dist/vectorstore/store.js";
 import { indexDocuments } from "../backend/dist/ingestion/indexDocuments.js";
 import { enforceApiToken, enforceRateLimit } from "./_security.js";
 import { attachRequestLogging } from "./_observability.js";
+import { sendHttpError } from "./_errors.js";
+
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 
 export const config = {
   api: {
     bodyParser: false,
-    maxBodySize: 10485760,
+    maxBodySize: MAX_UPLOAD_BYTES,
   },
 };
 
@@ -31,8 +34,8 @@ export default async function handler(
     const form = new IncomingForm({
       multiples: true,
       keepExtensions: true,
-      maxFileSize: 10485760,
-      maxTotalFileSize: 10485760 * 4,
+      maxFileSize: MAX_UPLOAD_BYTES,
+      maxTotalFileSize: MAX_UPLOAD_BYTES,
       maxFiles: 4,
     });
 
@@ -76,8 +79,7 @@ export default async function handler(
       })),
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Erro interno";
-    return res.status(500).json({ error: message });
+    return sendHttpError(res, err);
   } finally {
     await Promise.all(
       tempFiles.map(async (file) => {

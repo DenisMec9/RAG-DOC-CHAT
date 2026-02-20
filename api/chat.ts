@@ -3,6 +3,7 @@ import { retrieveContext } from "../backend/dist/rag/retrieveContext.js";
 import { buildPrompt } from "../backend/dist/rag/buildPrompt.js";
 import { enforceApiToken, enforceRateLimit } from "./_security.js";
 import { attachRequestLogging } from "./_observability.js";
+import { sendHttpError } from "./_errors.js";
 
 export default async function handler(
   req: VercelRequest,
@@ -86,7 +87,6 @@ export default async function handler(
 
     return res.json({ answer, sources });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Erro interno";
-    return res.status(500).json({ error: message });
+    return sendHttpError(res, err);
   }
 }

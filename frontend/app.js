@@ -10,6 +10,7 @@ const selectedFiles = document.getElementById("selectedFiles");
 const chatWindow = document.getElementById("chatWindow");
 const questionInput = document.getElementById("questionInput");
 const DEFAULT_TOP_K = 6;
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 const fileAlert = document.getElementById("fileAlert");
 const fileSelect = document.getElementById("fileSelect");
 const askBtn = document.getElementById("askBtn");
@@ -95,6 +96,15 @@ function renderSelectedFiles() {
   reindexBtn.disabled = false;
 }
 
+function validateUploadFiles(files) {
+  const oversizedFile = files.find((file) => file.size > MAX_UPLOAD_BYTES);
+  if (oversizedFile) {
+    const maxMb = (MAX_UPLOAD_BYTES / (1024 * 1024)).toFixed(0);
+    return `Arquivo "${oversizedFile.name}" excede o limite de ${maxMb}MB da Vercel.`;
+  }
+  return "";
+}
+
 function clearSelectedFiles() {
   fileInput.value = "";
   renderSelectedFiles();
@@ -170,6 +180,13 @@ async function sendIngest(mode) {
 
   if (files.length === 0) {
     ingestFeedback.textContent = "Selecione pelo menos um arquivo.";
+    return;
+  }
+
+  const sizeError = validateUploadFiles(files);
+  if (sizeError) {
+    ingestFeedback.textContent = sizeError;
+    setStatus("Upload bloqueado por tamanho", false);
     return;
   }
 
@@ -296,9 +313,15 @@ async function loadIndexedFiles() {
       indexedFiles.length = 0;
       indexedFiles.push(...(data.files ?? []));
       updateFileSelection(activeFile || indexedFiles[0] || "");
+      return;
     }
+    const message = data.error ?? "Falha ao carregar arquivos indexados.";
+    ingestFeedback.textContent = message;
+    setStatus("Persistencia indisponivel", false);
   } catch (err) {
-    console.error("Failed to load indexed files:", err);
+    const message = err instanceof Error ? err.message : "Falha ao carregar arquivos.";
+    ingestFeedback.textContent = message;
+    setStatus("Erro ao carregar arquivos", false);
   }
 }
 
